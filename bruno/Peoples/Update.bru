@@ -1,0 +1,30 @@
+meta {
+  name: Update
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:8081/api/v1/peoples/1
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "firstName": "John2",
+    "lastName": "Doe",
+    "age": 30,
+    "address": {
+      "street": "123 Main St",
+      "city": "Nantes",
+      "zipCode": "44000",
+      "country": "France"
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

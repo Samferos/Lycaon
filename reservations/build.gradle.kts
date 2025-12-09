@@ -20,8 +20,12 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("io.github.oshai:kotlin-logging-jvm:7.0.13")
+	runtimeOnly("com.h2database:h2")
 
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -31,8 +35,6 @@ dependencies {
 	testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
     testImplementation("io.mockk:mockk:1.14.7")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
-
-	implementation("io.github.oshai:kotlin-logging-jvm:7.0.13")
 }
 
 kotlin {
