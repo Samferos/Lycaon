@@ -14,5 +14,5 @@ data class Reservation(
 )
 
 data class Peoples(
-    val id: Long,
+    val id: Long
 )
