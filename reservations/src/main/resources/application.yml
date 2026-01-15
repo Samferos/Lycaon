@@ -13,4 +13,9 @@ spring:
       hibernate:
         format_sql: true
 server:
-  port: 8080  port: 8082
+  port: 8082
+custom:
+  rooms:
+    base-url: http://localhost:8083/api/v1
+  peoples:
+    base-url: http://localhost:8081/api/v1

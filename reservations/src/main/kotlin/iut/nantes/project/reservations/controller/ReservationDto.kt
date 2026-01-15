@@ -1,4 +1,4 @@
-package iut.nantes.project.reservations.client
+package iut.nantes.project.reservations.controller
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonProperty
