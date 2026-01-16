@@ -27,6 +27,8 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("io.github.oshai:kotlin-logging-jvm:7.0.13")
+	implementation("org.mock-server:mockserver-netty:5.15.0")
+	implementation("org.mock-server:mockserver-client-java:5.15.0")
 	runtimeOnly("com.h2database:h2")
 
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")

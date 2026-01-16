@@ -1,2 +1,7 @@
 spring:
   application.name: gateway
+custom:
+  peoples:
+    baseUrl: http://localhost:8888
+  rooms:
+    baseUrl: http://localhost:8888
