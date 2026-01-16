@@ -7,7 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
 @EnableConfigurationProperties(ClientProperties::class)
-class WebClientConfig(val props: ClientProperties) {
+class HttpClientConfig(val props: ClientProperties) {
 
     @Bean
     fun roomsWebClient(builder: WebClient.Builder): WebClient =

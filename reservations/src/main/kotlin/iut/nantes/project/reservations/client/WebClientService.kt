@@ -1,11 +1,14 @@
 package iut.nantes.project.reservations.client
 
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-@Component
+@Service
+@Profile("webclient")
 class WebClientService(
     private val roomsWebClient: WebClient, private val peoplesWebClient: WebClient
 ) {
