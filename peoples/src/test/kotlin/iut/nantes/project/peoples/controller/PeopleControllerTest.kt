@@ -134,7 +134,6 @@ class PeopleControllerIntegrationTest {
         mockMvc.delete("/api/v1/peoples/${created.id}") {
         }.andExpect { status { isNoContent() } }
 
-        // Vérifier que c'est bien supprimé
         mockMvc.get("/api/v1/peoples/${created.id}") {
         }.andExpect { status { isNotFound() } }
     }
