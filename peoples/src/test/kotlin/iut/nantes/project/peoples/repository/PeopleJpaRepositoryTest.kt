@@ -1,12 +1,20 @@
 package iut.nantes.project.peoples.repository
 
+import iut.nantes.project.peoples.client.ReservationClient
 import iut.nantes.project.peoples.domain.Address
 import iut.nantes.project.peoples.domain.People
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNull
+import org.mockito.Mockito.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.test.context.ActiveProfiles
 
 @DataJpaTest
@@ -16,9 +24,16 @@ class PeopleJpaRepositoryTest {
     @Autowired
     private lateinit var springRepo: PeopleJpaSpringRepository
 
+    private lateinit var repository: PeopleJpaRepository
+
+    @BeforeEach
+    fun setUp() {
+        repository = PeopleJpaRepository(springRepo)
+        springRepo.deleteAll()
+    }
+
     @Test
-    fun `should save and find a person in database`() {
-        val repository = PeopleJpaRepository(springRepo)
+    fun `should save and find a person by id`() {
         val person = People(
             id = 0,
             firstName = "Alice",
@@ -37,29 +52,51 @@ class PeopleJpaRepositoryTest {
     }
 
     @Test
-    fun `should return null when person does not exist`() {
-        val repository = PeopleJpaRepository(springRepo)
-        val found = repository.findById(999L)
+    fun `should find all people`() {
+        val person1 =
+            repository.save(People(0, "Alice", "Zorg", 30, Address("10 rue test", "Nantes", "44000", "France")))
+        val person2 =
+            repository.save(People(0, "Bob", "Marley", 35, Address("20 rue test", "Paris", "75000", "France")))
 
-        assertEquals(null, found)
+        val allPeople = repository.findAll()
+
+        assertEquals(2, allPeople.size)
+        assertTrue(allPeople.any { it.firstName == "Alice" })
+        assertTrue(allPeople.any { it.firstName == "Bob" })
     }
 
     @Test
-    fun `should delete address when people is deleted`() {
-        val repository = PeopleJpaRepository(springRepo)
-        val person = People(
-            id = 0,
-            firstName = "Test",
-            lastName = "Delete",
-            age = 20,
-            address = Address("Rue à supprimer", "Nantes", "44000", "France")
-        )
-        val saved = repository.save(person)
-        val personId = saved.id
+    fun `should find people by last name`() {
+        repository.save(People(0, "Alice", "Zorg", 30, Address("10 rue test", "Nantes", "44000", "France")))
+        repository.save(People(0, "Bob", "Zorg", 25, Address("20 rue test", "Paris", "75000", "France")))
+        repository.save(People(0, "Charlie", "Marley", 35, Address("30 rue test", "Lyon", "69000", "France")))
 
-        repository.deleteById(personId)
+        val zorgs = repository.findByLastName("Zorg")
 
-        val found = repository.findById(personId)
-        assertEquals(null, found)
+        assertEquals(2, zorgs.size)
+        assertTrue(zorgs.all { it.lastName == "Zorg" })
+    }
+
+    @Test
+    fun `should delete person by id`() {
+        val saved = repository.save(People(0, "Alice", "Zorg", 30, Address("10 rue test", "Nantes", "44000", "France")))
+
+        val deleted = repository.deleteById(saved.id)
+        val found = repository.findById(saved.id)
+
+        assertTrue(deleted)
+        assertNull(found)
+    }
+
+    @Test
+    fun `should return false when deleting non-existent person`() {
+        val deleted = repository.deleteById(999L)
+        assertFalse(deleted)
+    }
+
+    @TestConfiguration
+    class MockReservationClientConfig {
+        @Bean
+        fun reservationClient(): ReservationClient = mock(ReservationClient::class.java)
     }
 }

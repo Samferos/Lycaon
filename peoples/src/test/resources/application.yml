@@ -1,2 +1,5 @@
 spring:
   application.name: products
+custom:
+  reservations:
+    baseUrl: http://localhost:8888
