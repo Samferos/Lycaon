@@ -1,12 +1,14 @@
 package iut.nantes.project.peoples.service
 
+import iut.nantes.project.peoples.client.ReservationClient
+import iut.nantes.project.peoples.controller.AddressDto
 import iut.nantes.project.peoples.controller.PeopleDto
 import iut.nantes.project.peoples.domain.People
 import iut.nantes.project.peoples.error.NotFoundException
 import iut.nantes.project.peoples.mapper.toModel
 import iut.nantes.project.peoples.repository.PeopleRepository
 
-class PeopleService(private val database: PeopleRepository) {
+class PeopleService(private val database: PeopleRepository, private val reservationClient: ReservationClient) {
 
     fun create(dto: PeopleDto): People {
         return database.save(dto.toModel())
@@ -33,8 +35,25 @@ class PeopleService(private val database: PeopleRepository) {
     }
 
     fun delete(id: Long) {
-        if (!database.deleteById(id)) {
-            throw NotFoundException("Personne non trouvée")
-        }
+        getById(id)
+
+        reservationClient.deleteReservationsByOwner(id)
+
+        database.deleteById(id)
+    }
+
+    fun updateAddress(id: Long, addressDto: AddressDto): People {
+        val existing = getById(id)
+
+        val updated = existing.copy(
+            address = existing.address.copy(
+                street = addressDto.street,
+                city = addressDto.city,
+                zipCode = addressDto.zipCode,
+                country = addressDto.country
+            )
+        )
+
+        return database.save(updated)
     }
 }

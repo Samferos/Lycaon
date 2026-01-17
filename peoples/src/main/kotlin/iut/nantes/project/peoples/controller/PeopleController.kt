@@ -42,4 +42,13 @@ class PeopleController(
     fun delete(@PathVariable id: Long) {
         peopleService.delete(id)
     }
+
+    @PutMapping("/{id}/address")
+    fun updateAddress(
+        @PathVariable id: Long,
+        @Valid @RequestBody address: AddressDto
+    ): People {
+        return peopleService.updateAddress(id, address)
+    }
+
 }

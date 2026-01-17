@@ -14,3 +14,6 @@ spring:
         format_sql: true
 server:
   port: 8081
+custom:
+  reservations:
+    base-url: http://localhost:8082/api/v1

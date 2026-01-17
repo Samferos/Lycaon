@@ -42,3 +42,7 @@ data class PeopleDto(
 
     @field:Valid val address: AddressDto
 )
+
+data class ReservationSummary(
+    val id: String
+)

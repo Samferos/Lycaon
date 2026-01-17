@@ -1,5 +1,6 @@
 package iut.nantes.project.peoples
 
+import iut.nantes.project.peoples.client.ReservationClient
 import iut.nantes.project.peoples.controller.PeopleController
 import iut.nantes.project.peoples.repository.PeopleHashMapRepository
 import iut.nantes.project.peoples.repository.PeopleJpaRepository
@@ -20,20 +21,19 @@ class PeoplesApplication {
 
     @Bean
     @Profile("!dev")
-    fun peopleDatabaseProd(springRepo: PeopleJpaSpringRepository): PeopleRepository {
-        return PeopleJpaRepository(springRepo)
-    }
+    fun peopleDatabaseProd(springRepo: PeopleJpaSpringRepository): PeopleRepository = PeopleJpaRepository(springRepo)
 
     @Bean
-    fun peopleService(database: PeopleRepository): PeopleService =
-        PeopleService(database)
+    fun peopleService(
+        database: PeopleRepository, reservationClient: ReservationClient
+    ): PeopleService = PeopleService(database, reservationClient)
 
     @Bean
-    fun peopleController(service: PeopleService): PeopleController =
-        PeopleController(service)
+    fun peopleController(service: PeopleService): PeopleController = PeopleController(service)
 }
 
 fun main(args: Array<String>) {
     runApplication<PeoplesApplication>(*args)
 }
+
 

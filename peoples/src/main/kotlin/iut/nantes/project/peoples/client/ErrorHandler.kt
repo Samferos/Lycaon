@@ -1,11 +1,11 @@
-package iut.nantes.project.peoples.config
+package iut.nantes.project.peoples.client
 
 import iut.nantes.project.peoples.error.ApiErrorResponse
 import iut.nantes.project.peoples.error.NotFoundException
-import org.springframework.http.HttpStatusCode
 import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
