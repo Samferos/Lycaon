@@ -175,7 +175,7 @@ class PeopleControllerIntegrationTest {
         mockMvc.get("/api/v1/peoples/${created.id}").andExpect {
             status { isOk() }
             jsonPath("$.address.street") { value("2 rue Nouvelle") }
-            jsonPath("$.firstName") { value("Jean") } // unchanged
+            jsonPath("$.firstName") { value("Jean") }
         }
     }
 
@@ -184,7 +184,7 @@ class PeopleControllerIntegrationTest {
             request().withMethod("GET").withPath("/reservations")
                 .withQueryStringParameter("ownerId", ownerId.toString())
         ).respond(
-            response().withStatusCode(204) // or 200 with empty array if your client expects JSON
+            response().withStatusCode(204)
         )
     }
 
