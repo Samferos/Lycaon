@@ -24,7 +24,7 @@ import org.mockserver.model.HttpResponse.response
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
 @AutoConfigureMockMvc
-class PeopleControllerIntegrationTest {
+class PeopleControllerTest {
 
     private val mockServer: ClientAndServer = startClientAndServer(8888)
 
