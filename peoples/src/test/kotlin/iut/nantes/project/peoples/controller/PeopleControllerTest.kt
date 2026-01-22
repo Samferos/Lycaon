@@ -62,11 +62,14 @@ class PeopleControllerTest {
     fun `getAll - should return list of people`() {
         val dto = createValidDto()
         mockMvc.post("/api/v1/peoples") {
+            header("X-User", "test-user")
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(dto)
         }.andExpect { status { isCreated() } }
 
-        mockMvc.get("/api/v1/peoples").andExpect {
+        mockMvc.get("/api/v1/peoples") {
+            header("X-User", "test-user")
+        }.andExpect {
             status { isOk() }
             content { contentType(MediaType.APPLICATION_JSON) }
             jsonPath("$[0].firstName") { value("Jean") }
@@ -77,13 +80,16 @@ class PeopleControllerTest {
     fun `getById - should return 200 when found`() {
         val dto = createValidDto()
         val result = mockMvc.post("/api/v1/peoples") {
+            header("X-User", "test-user")
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(dto)
         }.andReturn()
 
         val created: People = objectMapper.readValue(result.response.contentAsString, People::class.java)
 
-        mockMvc.get("/api/v1/peoples/${created.id}").andExpect {
+        mockMvc.get("/api/v1/peoples/${created.id}") {
+            header("X-User", "test-user")
+        }.andExpect {
             status { isOk() }
             jsonPath("$.lastName") { value("Dupont") }
         }
@@ -91,13 +97,14 @@ class PeopleControllerTest {
 
     @Test
     fun `getById - should return 404 when not found`() {
-        mockMvc.get("/api/v1/peoples/999").andExpect { status { isNotFound() } }
+        mockMvc.get("/api/v1/peoples/999") { header("X-User", "test-user") }.andExpect { status { isNotFound() } }
     }
 
     @Test
     fun `create - should return 201 when valid`() {
         val dto = createValidDto()
         mockMvc.post("/api/v1/peoples") {
+            header("X-User", "test-user")
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(dto)
         }.andExpect {
@@ -111,6 +118,7 @@ class PeopleControllerTest {
     fun `create - should return 400 when age is too low`() {
         val invalidDto = createValidDto().copy(age = 15)
         mockMvc.post("/api/v1/peoples") {
+            header("X-User", "test-user")
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(invalidDto)
         }.andExpect { status { isBadRequest() } }
@@ -120,6 +128,7 @@ class PeopleControllerTest {
     fun `update - should return 200 when successful`() {
         val dto = createValidDto()
         val result = mockMvc.post("/api/v1/peoples") {
+            header("X-User", "test-user")
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(dto)
         }.andReturn()
@@ -128,11 +137,14 @@ class PeopleControllerTest {
         val updateDto = dto.copy(firstName = "Paul")
 
         mockMvc.put("/api/v1/peoples/${created.id}") {
+            header("X-User", "test-user")
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(updateDto)
         }.andExpect { status { isOk() } }
 
-        mockMvc.get("/api/v1/peoples/${created.id}").andExpect {
+        mockMvc.get("/api/v1/peoples/${created.id}") {
+            header("X-User", "test-user")
+        }.andExpect {
             status { isOk() }
             jsonPath("$.firstName") { value("Paul") }
         }
@@ -142,6 +154,7 @@ class PeopleControllerTest {
     fun `delete - should return 204`() {
         val dto = createValidDto()
         val result = mockMvc.post("/api/v1/peoples") {
+            header("X-User", "test-user")
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(dto)
         }.andReturn()
@@ -150,9 +163,12 @@ class PeopleControllerTest {
 
         mockGetReservations(created.id)
 
-        mockMvc.delete("/api/v1/peoples/${created.id}").andExpect { status { isNoContent() } }
+        mockMvc.delete("/api/v1/peoples/${created.id}") { header("X-User", "test-user") }
+            .andExpect { status { isNoContent() } }
 
-        mockMvc.get("/api/v1/peoples/${created.id}").andExpect { status { isNotFound() } }
+        mockMvc.get("/api/v1/peoples/${created.id}") {
+            header("X-User", "test-user")
+        }.andExpect { status { isNotFound() } }
     }
 
 
@@ -160,6 +176,7 @@ class PeopleControllerTest {
     fun `updateAddress - should update only address`() {
         val dto = createValidDto()
         val result = mockMvc.post("/api/v1/peoples") {
+            header("X-User", "test-user")
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(dto)
         }.andReturn()
@@ -168,11 +185,14 @@ class PeopleControllerTest {
         val newAddress = AddressDto("2 rue Nouvelle", "Paris", "75000", "France")
 
         mockMvc.put("/api/v1/peoples/${created.id}/address") {
+            header("X-User", "test-user")
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(newAddress)
         }.andExpect { status { isOk() } }
 
-        mockMvc.get("/api/v1/peoples/${created.id}").andExpect {
+        mockMvc.get("/api/v1/peoples/${created.id}") {
+            header("X-User", "test-user")
+        }.andExpect {
             status { isOk() }
             jsonPath("$.address.street") { value("2 rue Nouvelle") }
             jsonPath("$.firstName") { value("Jean") }
