@@ -7,6 +7,8 @@ bff:
 spring:
   application:
     name: bff-service
+  main:
+    web-application-type: reactive
   datasource:
     url: jdbc:h2:mem:bffdb
     driver-class-name: org.h2.Driver
