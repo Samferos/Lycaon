@@ -14,7 +14,8 @@ class ReservationHttpClientConfig(
 
     @Bean
     fun reservationsWebClient(builder: WebClient.Builder): WebClient =
-        builder.baseUrl(props.reservations.baseUrl).defaultHeader("X-THREAD", Thread.currentThread().name).build()
+        builder.baseUrl(props.reservations.baseUrl).defaultHeader("X-User", "INTERNAL_PEOPLE_SERVICE")
+            .defaultHeader("X-THREAD", Thread.currentThread().name).build()
 
     @Bean
     fun reservationClient(reservationsWebClient: WebClient) = ReservationClient(reservationsWebClient)

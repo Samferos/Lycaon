@@ -13,8 +13,7 @@ import java.util.*
 
 @Service
 class ReservationService(
-    private val repository: ReservationRepository,
-    private val webClientService: WebClientService
+    private val repository: ReservationRepository, private val webClientService: WebClientService
 ) {
 
     fun createReservation(dto: ReservationDto): ReservationEntity {
@@ -25,7 +24,7 @@ class ReservationService(
         val roomExists = webClientService.checkRoomExists(dto.roomId).block() ?: false
         if (!roomExists) throw InvalidDataException("Salle inexistante")
 
-        val existing = repository.findByRoomAndDayBetween(dto.roomId, dto.day, dto.day)
+        val existing = repository.findByRoomAndDayBetween(dto.ownerId, dto.roomId, dto.day, dto.day)
         if (existing.any { dto.start < it.end && dto.end > it.start }) {
             throw ReservationConflictException("Salle déjà réservée sur ce créneau")
         }
@@ -38,11 +37,11 @@ class ReservationService(
         return repository.findById(id) ?: throw NotFoundException("Réservation non trouvée")
     }
 
-    fun findAll(roomId: Long?, dayStart: LocalDate?, dayEnd: LocalDate?): List<ReservationEntity> {
+    fun findAll(ownerId: Long?, roomId: Long?, dayStart: LocalDate?, dayEnd: LocalDate?): List<ReservationEntity> {
         if (dayStart != null && dayEnd != null && dayStart.isAfter(dayEnd)) {
             throw InvalidDataException("dayStart doit être inférieur ou égal à dayEnd")
         }
-        return repository.findByRoomAndDayBetween(roomId, dayStart, dayEnd)
+        return repository.findByRoomAndDayBetween(ownerId, roomId, dayStart, dayEnd)
     }
 
     fun updateReservation(id: UUID, dto: ReservationDto): ReservationEntity {
@@ -54,18 +53,14 @@ class ReservationService(
         val roomExists = webClientService.checkRoomExists(dto.roomId).block() ?: false
         if (!roomExists) throw InvalidDataException("Salle inexistante")
 
-        val conflicts = repository.findByRoomAndDayBetween(dto.roomId, dto.day, dto.day)
-            .filter { it.id != id }
+        val conflicts =
+            repository.findByRoomAndDayBetween(dto.ownerId, dto.roomId, dto.day, dto.day).filter { it.id != id }
         if (conflicts.any { dto.start < it.end && dto.end > it.start }) {
             throw ReservationConflictException("Salle déjà réservée sur ce créneau")
         }
 
         val updated = existing.copy(
-            peoples = dto.peoples,
-            roomId = dto.roomId,
-            start = dto.start,
-            end = dto.end,
-            day = dto.day
+            peoples = dto.peoples, roomId = dto.roomId, start = dto.start, end = dto.end, day = dto.day
         )
         return repository.save(updated)
     }
@@ -77,14 +72,13 @@ class ReservationService(
         return true
     }
 
-    private fun ReservationDto.toEntity(): ReservationEntity =
-        ReservationEntity(
-            id = this.id ?: UUID.randomUUID(),
-            ownerId = this.ownerId,
-            peoples = this.peoples.toMutableList(),
-            roomId = this.roomId,
-            start = this.start,
-            end = this.end,
-            day = this.day
-        )
+    private fun ReservationDto.toEntity(): ReservationEntity = ReservationEntity(
+        id = this.id ?: UUID.randomUUID(),
+        ownerId = this.ownerId,
+        peoples = this.peoples.toMutableList(),
+        roomId = this.roomId,
+        start = this.start,
+        end = this.end,
+        day = this.day
+    )
 }

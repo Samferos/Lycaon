@@ -14,50 +14,48 @@ class AggregationService(
 
     /**
      * GET /peoples/{id}
-     * Récupère une personne et la liste des IDs de ses réservations (owner).
+     * Si getPerson renvoie 404, le BFF renverra 404 automatiquement.
      */
     fun getPersonWithReservations(id: Long): Mono<PersonAggregatedDto> {
-        val personMono = webClientService.getPerson(id)
-
-        val reservationsMono =
-            webClientService.getAllReservations().filter { it.ownerId == id }.map { it.id }.collectList()
-
-        return Mono.zip(personMono, reservationsMono).map { tuple ->
-            val person = tuple.t1
-            val resIds = tuple.t2
-
-            PersonAggregatedDto(
-                firstName = person.firstName,
-                lastName = person.lastName,
-                age = person.age,
-                address = person.address,
-                reservations = resIds
-            )
+        return webClientService.getPerson(id).flatMap { person ->
+            webClientService.getReservationsByOwner(id).map { it.id }.collectList().map { resIds ->
+                    PersonAggregatedDto(person.firstName, person.lastName, person.age, person.address, resIds)
+                }
         }
     }
 
     /**
      * GET /reservations/{id}
-     * Agrège Reservation + Owner + Participants + Room
+     * Ici, on applique le fallback DELETED si une personne manque.
      */
     fun getFullReservation(id: UUID): Mono<ReservationAggregatedDto> {
         return webClientService.getReservation(id).flatMap { resRaw ->
 
-            val ownerMono =
-                webClientService.getPerson(resRaw.ownerId).map { SimplePersonDto(it.id, it.firstName, it.lastName) }
+            val ownerMono = webClientService.getPerson(resRaw.ownerId)
+                .map { SimplePersonDto(it.id, it.firstName, it.lastName) }
+                .onErrorResume {
+                    Mono.just(SimplePersonDto(resRaw.ownerId, "DELETED", "DELETED"))
+                }
+
+            val participantsMono = Flux.fromIterable(resRaw.peoples).flatMap { peopleId ->
+                webClientService.getPerson(peopleId)
+                    .map { SimplePersonDto(it.id, it.firstName, it.lastName) }
+                    .onErrorResume {
+                        Mono.just(SimplePersonDto(peopleId, "DELETED", "DELETED"))
+                    }
+            }.collectList()
 
             val roomMono = webClientService.getRoom(resRaw.roomId).map { SimpleRoomDto(it.id, it.name) }
 
-            val participantsMono = Flux.fromIterable(resRaw.peoples).flatMap { peopleId ->
-                    webClientService.getPerson(peopleId).map { SimplePersonDto(it.id, it.firstName, it.lastName) }
-                }.collectList()
-
             Mono.zip(ownerMono, participantsMono, roomMono).map { tuple ->
                 ReservationAggregatedDto(
-                    id = resRaw.id, owner = tuple.t1,       // Owner
-                    peoples = tuple.t2,     // Participants
-                    roomId = tuple.t3,      // Room
-                    start = resRaw.start, end = resRaw.end, day = resRaw.day
+                    id = resRaw.id,
+                    owner = tuple.t1,
+                    peoples = tuple.t2,
+                    roomId = tuple.t3,
+                    start = resRaw.start,
+                    end = resRaw.end,
+                    day = resRaw.day
                 )
             }
         }

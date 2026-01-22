@@ -80,7 +80,6 @@ class ReservationControllerTest {
 
     @Test
     fun `should return 400 when owner does not exist`() {
-        // GIVEN: L'owner 99 n'existe pas dans le service distant
         mockServer.`when`(request().withMethod("GET").withPath("/api/v1/peoples/99"))
             .respond(response().withStatusCode(404))
 

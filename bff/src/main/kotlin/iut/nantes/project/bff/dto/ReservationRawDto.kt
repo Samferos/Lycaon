@@ -6,7 +6,7 @@ import java.util.UUID
 
 data class ReservationRawDto(
     val id: UUID,
-    @JsonProperty("owner") val ownerId: Long,
+    @JsonProperty("ownerId") val ownerId: Long,
     val peoples: List<Long>,
     val roomId: Long,
     val start: Int,

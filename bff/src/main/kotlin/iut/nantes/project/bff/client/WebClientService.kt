@@ -1,11 +1,9 @@
 package iut.nantes.project.bff.client
 
-import iut.nantes.project.bff.dto.AddressDto
 import iut.nantes.project.bff.dto.PersonRawDto
 import iut.nantes.project.bff.dto.ReservationRawDto
 import iut.nantes.project.bff.dto.RoomRawDto
 import org.springframework.stereotype.Service
-import org.springframework.web.method.support.CompositeUriComponentsContributor
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToFlux
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -21,18 +19,8 @@ class WebClientService(
 ) {
 
     fun getPerson(id: Long): Mono<PersonRawDto> {
-        return webClient.get().uri("${props.peoples.baseUrl}/api/v1/peoples/{id}", id).retrieve()
-            .bodyToMono<PersonRawDto>().onErrorResume { _ ->
-                Mono.just(
-                    PersonRawDto(
-                        id = id,
-                        firstName = "DELETED",
-                        lastName = "DELETED",
-                        age = 0,
-                        address = AddressDto("", "", "", "")
-                    )
-                )
-            }
+        return webClient.get().uri("${props.peoples.baseUrl}/api/v1/peoples/{id}", id).header("X-User", "BFF_SYSTEM")
+            .retrieve().bodyToMono<PersonRawDto>()
     }
 
     fun getRoom(id: Long): Mono<RoomRawDto> {
@@ -49,8 +37,8 @@ class WebClientService(
             }.bodyToMono<ReservationRawDto>()
     }
 
-    fun getAllReservations(): Flux<ReservationRawDto> {
-        return webClient.get().uri("${props.reservations.baseUrl}/api/v1/reservations").retrieve()
+    fun getReservationsByOwner(ownerId: Long): Flux<ReservationRawDto> {
+        return webClient.get().uri("${props.reservations.baseUrl}/api/v1/reservations?ownerId=$ownerId").retrieve()
             .bodyToFlux<ReservationRawDto>()
     }
 }

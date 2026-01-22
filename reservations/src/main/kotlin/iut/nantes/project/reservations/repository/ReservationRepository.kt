@@ -7,6 +7,6 @@ interface ReservationRepository {
     fun save(reservation: ReservationEntity): ReservationEntity
     fun findById(id: UUID): ReservationEntity?
     fun findAll(): List<ReservationEntity>
-    fun findByRoomAndDayBetween(roomId: Long?, dayStart: LocalDate?, dayEnd: LocalDate?): List<ReservationEntity>
+    fun findByRoomAndDayBetween(ownerId:Long?, roomId: Long?, dayStart: LocalDate?, dayEnd: LocalDate?): List<ReservationEntity>
     fun deleteById(id: UUID): Boolean
 }

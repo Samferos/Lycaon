@@ -15,24 +15,19 @@ class ReservationHashMapRepository : ReservationRepository {
         return r
     }
 
-    override fun findById(id: UUID): ReservationEntity? =
-        data[id]
+    override fun findById(id: UUID): ReservationEntity? = data[id]
 
-    override fun findAll(): List<ReservationEntity> =
-        data.values.toList()
+    override fun findAll(): List<ReservationEntity> = data.values.toList()
 
-    override fun deleteById(id: UUID): Boolean =
-        data.remove(id) != null
+    override fun deleteById(id: UUID): Boolean = data.remove(id) != null
 
     override fun findByRoomAndDayBetween(
-        roomId: Long?,
-        dayStart: LocalDate?,
-        dayEnd: LocalDate?
+        ownerId: Long?, roomId: Long?, dayStart: LocalDate?, dayEnd: LocalDate?
     ): List<ReservationEntity> {
         return data.values.filter { reservation ->
-            (roomId == null || reservation.roomId == roomId) &&
-                    (dayStart == null || !reservation.day.isBefore(dayStart)) &&
-                    (dayEnd == null || !reservation.day.isAfter(dayEnd))
+            (ownerId == null || reservation.ownerId == ownerId) && (roomId == null || reservation.roomId == roomId) && (dayStart == null || !reservation.day.isBefore(
+                dayStart
+            )) && (dayEnd == null || !reservation.day.isAfter(dayEnd))
         }
     }
 }

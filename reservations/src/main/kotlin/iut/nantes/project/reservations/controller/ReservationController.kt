@@ -34,13 +34,14 @@ class ReservationController(
      */
     @GetMapping
     fun findAll(
+        @RequestParam(required = false) ownerId: Long?,
         @RequestParam(required = false) roomId: Long?,
         @RequestParam(required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dayStart: LocalDate?,
         @RequestParam(required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dayEnd: LocalDate?
     ): List<ReservationEntity> {
-        return reservationService.findAll(roomId, dayStart, dayEnd)
+        return reservationService.findAll(ownerId, roomId, dayStart, dayEnd)
     }
 
     /** PUT /api/v1/reservations/{id} */
