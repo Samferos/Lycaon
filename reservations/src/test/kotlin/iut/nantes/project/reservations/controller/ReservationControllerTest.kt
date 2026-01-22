@@ -51,15 +51,15 @@ class ReservationControllerTest {
 
         (participantIds + ownerId).forEach { id ->
             mockServer.`when`(request().withMethod("GET").withPath("/peoples/$id")).respond(
-                    response().withStatusCode(200).withHeader("Content-Type", "application/json")
-                        .withBody("""{"id": $id}""")
-                )
+                response().withStatusCode(200).withHeader("Content-Type", "application/json")
+                    .withBody("""{"id": $id}""")
+            )
         }
 
         mockServer.`when`(request().withMethod("GET").withPath("/rooms/$roomId")).respond(
-                response().withStatusCode(200).withHeader("Content-Type", "application/json")
-                    .withBody("""{"id": $roomId}""")
-            )
+            response().withStatusCode(200).withHeader("Content-Type", "application/json")
+                .withBody("""{"id": $roomId}""")
+        )
 
         val reservationJson = """
             {
@@ -73,7 +73,8 @@ class ReservationControllerTest {
         """.trimIndent()
 
         mockMvc.perform(
-            post("/api/v1/reservations").contentType(MediaType.APPLICATION_JSON).content(reservationJson)
+            post("/api/v1/reservations").header("X-User", "test-user").contentType(MediaType.APPLICATION_JSON)
+                .content(reservationJson)
         ).andExpect(status().isCreated).andExpect(jsonPath("$.ownerId").value(ownerId))
             .andExpect(jsonPath("$.roomId").value(roomId))
     }
@@ -95,7 +96,8 @@ class ReservationControllerTest {
         """.trimIndent()
 
         mockMvc.perform(
-            post("/api/v1/reservations").contentType(MediaType.APPLICATION_JSON).content(reservationJson)
+            post("/api/v1/reservations").header("X-User", "test-user").contentType(MediaType.APPLICATION_JSON)
+                .content(reservationJson)
         ).andExpect(status().isBadRequest)
     }
 
@@ -113,7 +115,8 @@ class ReservationControllerTest {
         """.trimIndent()
 
         mockMvc.perform(
-            post("/api/v1/reservations").contentType(MediaType.APPLICATION_JSON).content(reservationJson)
+            post("/api/v1/reservations").header("X-User", "test-user").contentType(MediaType.APPLICATION_JSON)
+                .content(reservationJson)
         ).andExpect(status().isBadRequest)
     }
 
@@ -121,6 +124,7 @@ class ReservationControllerTest {
     fun `should return 404 when reservation id is unknown`() {
         val randomId = UUID.randomUUID()
 
-        mockMvc.perform(get("/api/v1/reservations/$randomId")).andExpect(status().isNotFound)
+        mockMvc.perform(get("/api/v1/reservations/$randomId").header("X-User", "test-user"))
+            .andExpect(status().isNotFound)
     }
 }
