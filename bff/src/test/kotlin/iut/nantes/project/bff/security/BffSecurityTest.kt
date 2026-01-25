@@ -59,13 +59,13 @@ class BffSecurityTest {
 
     @Test
     fun `GET peoples should fail without Auth`() {
-        webTestClient.get().uri("/api/v1/peoples/1").exchange().expectStatus().isUnauthorized
+        webTestClient.get().uri("/peoples/1").exchange().expectStatus().isUnauthorized
     }
 
     @Test
     @WithMockUser(username = "toto", roles = ["USER"])
     fun `GET peoples should succeed with USER role`() {
-        webTestClient.get().uri("/api/v1/peoples/1").exchange().expectStatus().isOk
+        webTestClient.get().uri("/peoples/1").exchange().expectStatus().isOk
     }
 
     @Test
@@ -77,7 +77,6 @@ class BffSecurityTest {
     @Test
     @WithMockUser(username = "admin", roles = ["ADMIN"])
     fun `DELETE peoples should succeed with ADMIN role`() {
-
         webTestClient.mutateWith(csrf()).delete().uri("/api/v1/peoples/1").exchange().expectStatus().is5xxServerError
     }
 

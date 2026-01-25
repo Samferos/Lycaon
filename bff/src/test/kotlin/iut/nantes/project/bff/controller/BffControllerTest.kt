@@ -59,7 +59,7 @@ class BffControllerTest {
 
         given(aggregationService.getPersonWithReservations(personId)).willReturn(Mono.just(mockAggregated))
 
-        webTestClient.get().uri("/api/v1/peoples/$personId").exchange().expectStatus().isOk.expectBody()
+        webTestClient.get().uri("/peoples/$personId").exchange().expectStatus().isOk.expectBody()
             .jsonPath("$.firstName").isEqualTo("Jean").jsonPath("$.reservations").isArray
     }
 
@@ -79,7 +79,7 @@ class BffControllerTest {
 
         given(aggregationService.getFullReservation(resId)).willReturn(Mono.just(mockRes))
 
-        webTestClient.get().uri("/api/v1/reservations/$resId").exchange().expectStatus().isOk.expectBody()
+        webTestClient.get().uri("/reservations/$resId").exchange().expectStatus().isOk.expectBody()
             .jsonPath("$.id").isEqualTo(resId.toString()).jsonPath("$.owner.firstName").isEqualTo("Jean")
     }
 }
